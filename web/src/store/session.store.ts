@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface SessionState {
   email: string | null;
@@ -13,6 +13,6 @@ export const useSessionStore = create<SessionState>()(
       setEmail: (email) => set({ email }),
       clear: () => set({ email: null }),
     }),
-    { name: "docchat-session" },
+    { name: 'docchat-session' },
   ),
 );

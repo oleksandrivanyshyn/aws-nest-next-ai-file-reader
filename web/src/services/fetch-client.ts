@@ -1,5 +1,5 @@
-import { env } from "@/config/env";
-import { useSessionStore } from "@/store/session.store";
+import { env } from '@/config/env';
+import { useSessionStore } from '@/store/session.store';
 
 type FetchOptions = RequestInit & {
   params?: Record<string, string | number | undefined>;
@@ -11,7 +11,7 @@ export class ApiError extends Error {
     public status: number,
   ) {
     super(message);
-    this.name = "ApiError";
+    this.name = 'ApiError';
   }
 }
 
@@ -29,16 +29,16 @@ export async function client<T>(
   };
 
   if (!(customConfig.body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
+    headers['Content-Type'] = 'application/json';
   }
 
   const email = useSessionStore.getState().email;
   if (email) {
-    headers["x-user-email"] = email;
+    headers['x-user-email'] = email;
   }
 
   const config: RequestInit = {
-    method: customConfig.method ?? "GET",
+    method: customConfig.method ?? 'GET',
     ...customConfig,
     headers,
   };
@@ -67,7 +67,7 @@ export async function client<T>(
     };
 
     const errorMessage = Array.isArray(errorData.message)
-      ? errorData.message.join(", ")
+      ? errorData.message.join(', ')
       : (errorData.message ?? `Request failed with status ${response.status}`);
 
     throw new ApiError(errorMessage, response.status);
