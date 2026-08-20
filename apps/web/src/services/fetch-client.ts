@@ -15,11 +15,6 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * The single place that knows how to talk to the backend. Every request
- * carries the user's email so the backend can scope data to them — this
- * app's whole notion of "who's asking" (see store/session.store.ts).
- */
 export async function client<T>(
   endpoint: string,
   { params, ...customConfig }: FetchOptions = {},
