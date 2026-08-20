@@ -26,9 +26,11 @@ export function UploadDropzone({ onFileSelected }: UploadDropzoneProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-      <div className="mb-1 text-sm font-semibold">Upload a PDF to start</div>
-      <p className="mb-4 text-sm text-muted-foreground">
+    <div className="flex flex-1 flex-col items-center justify-center p-6 text-center md:p-8">
+      <div className="mb-1 text-sm font-semibold md:text-base">
+        Upload a PDF to start
+      </div>
+      <p className="mb-4 text-sm text-muted-foreground md:mb-5 md:text-base">
         Drop a file here, or choose one. One document at a time.
       </p>
 
@@ -44,11 +46,15 @@ export function UploadDropzone({ onFileSelected }: UploadDropzoneProps) {
           handleFile(e.dataTransfer.files[0]);
         }}
         className={cn(
-          'flex w-full max-w-sm flex-col items-center gap-3 rounded-lg border border-dashed p-8',
+          'flex w-full max-w-sm flex-col items-center gap-3 rounded-lg border border-dashed p-8 md:max-w-md md:gap-4 md:p-10',
           isDragOver ? 'border-primary bg-accent' : 'border-border',
         )}
       >
-        <Button type="button" onClick={() => inputRef.current?.click()}>
+        <Button
+          type="button"
+          className="md:h-10 md:px-5 md:text-base"
+          onClick={() => inputRef.current?.click()}
+        >
           Choose file
         </Button>
         <input
@@ -60,7 +66,11 @@ export function UploadDropzone({ onFileSelected }: UploadDropzoneProps) {
         />
       </div>
 
-      {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+      {error && (
+        <p className="mt-3 text-sm text-destructive md:mt-4 md:text-base">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

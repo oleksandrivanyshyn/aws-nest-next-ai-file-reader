@@ -47,9 +47,9 @@ export function ChatView() {
         <DocumentHeader doc={doc} isUploading={isUploading} />
 
         {isLoading ? (
-          <div className="flex flex-1 flex-col gap-3 p-4">
-            <Skeleton className="h-16 w-3/4" />
-            <Skeleton className="ml-auto h-10 w-1/2" />
+          <div className="flex flex-1 flex-col gap-3 p-4 md:gap-4 md:p-6">
+            <Skeleton className="h-16 w-3/4 md:h-20" />
+            <Skeleton className="ml-auto h-10 w-1/2 md:h-12" />
           </div>
         ) : isUploading ? (
           <UploadProgress percent={progress} onCancel={cancel} />

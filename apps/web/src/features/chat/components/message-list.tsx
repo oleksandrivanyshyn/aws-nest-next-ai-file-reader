@@ -8,27 +8,27 @@ interface MessageListProps {
 export function MessageList({ messages }: MessageListProps) {
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-muted-foreground">
+      <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-muted-foreground md:text-base">
         Ask anything about this document to get started.
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3 overflow-y-auto p-4">
+    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3 overflow-y-auto p-4 md:gap-4 md:p-6">
       {messages.map((message, index) => (
         <div
           key={index}
           className={cn(
-            'max-w-[min(76%,480px)] rounded-[6px] px-3.5 py-2 text-[13px]',
+            'max-w-[min(76%,480px)] rounded-[6px] px-3.5 py-2 text-[13px] md:max-w-[min(76%,540px)] md:px-4 md:py-2.5 md:text-base',
             message.role === 'user'
               ? 'self-end bg-primary text-primary-foreground'
-              : 'max-w-[min(82%,520px)] self-start border border-border bg-card',
+              : 'max-w-[min(82%,520px)] self-start border border-border bg-card md:max-w-[min(82%,580px)]',
           )}
         >
           {message.content}
           {message.sourceClause && (
-            <span className="mt-1.5 block text-[11px] text-muted-foreground">
+            <span className="mt-1.5 block text-[11px] text-muted-foreground md:mt-2 md:text-xs">
               From {message.sourceClause}
             </span>
           )}

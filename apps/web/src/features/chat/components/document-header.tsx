@@ -34,11 +34,11 @@ export function DocumentHeader({
   })();
 
   return (
-    <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
-      <div className="flex min-w-0 items-center gap-2.5">
+    <div className="flex items-center justify-between border-b border-border px-4 py-3 md:px-6 md:py-4">
+      <div className="flex min-w-0 items-center gap-2.5 md:gap-3">
         <div
           className={
-            'grid size-8 shrink-0 place-items-center rounded text-[10px] font-bold tracking-wide ' +
+            'grid size-8 md:size-10 shrink-0 place-items-center rounded text-[10px] md:text-xs font-bold tracking-wide ' +
             (doc?.status === 'error'
               ? 'bg-destructive/15 text-destructive'
               : iconOn
@@ -47,14 +47,16 @@ export function DocumentHeader({
           }
         >
           {doc?.status === 'error' ? (
-            <FileWarning className="size-4" />
+            <FileWarning className="size-4 md:size-5" />
           ) : (
-            <FileText className="size-4" />
+            <FileText className="size-4 md:size-5" />
           )}
         </div>
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold">{filename}</div>
-          <div className="text-xs text-muted-foreground">{meta}</div>
+          <div className="truncate text-sm md:text-base font-semibold">
+            {filename}
+          </div>
+          <div className="text-xs md:text-sm text-muted-foreground">{meta}</div>
         </div>
       </div>
       <StatusChip label={label} tone={tone} />

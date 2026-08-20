@@ -18,7 +18,7 @@ export function StatusChip({ label, tone }: StatusChipProps) {
   return (
     <span
       className={cn(
-        'rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap',
+        'rounded-full px-2.5 py-1 text-[11px] md:px-3 md:py-1.5 md:text-xs font-semibold whitespace-nowrap',
         TONE_CLASSES[tone],
       )}
     >
