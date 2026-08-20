@@ -43,7 +43,7 @@ export function ChatView() {
 
   return (
     <div className="min-h-svh bg-background md:flex md:items-center md:justify-center md:bg-muted/30 md:p-6">
-      <div className="mx-auto flex h-svh w-full flex-col md:h-[min(860px,88svh)] md:max-w-2xl md:overflow-hidden md:rounded-xl md:border md:border-border md:shadow-sm lg:max-w-3xl">
+      <div className="mx-auto flex h-svh w-full flex-col md:h-[min(900px,90svh)] md:max-w-2xl md:overflow-hidden md:rounded-xl md:border md:border-border md:shadow-sm lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
         <DocumentHeader doc={doc} isUploading={isUploading} />
 
         {isLoading ? (

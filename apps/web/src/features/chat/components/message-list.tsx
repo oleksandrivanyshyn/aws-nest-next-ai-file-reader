@@ -15,15 +15,15 @@ export function MessageList({ messages }: MessageListProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
+    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3 overflow-y-auto p-4">
       {messages.map((message, index) => (
         <div
           key={index}
           className={cn(
-            'max-w-[76%] rounded-[6px] px-3.5 py-2 text-[13px]',
+            'max-w-[min(76%,480px)] rounded-[6px] px-3.5 py-2 text-[13px]',
             message.role === 'user'
               ? 'self-end bg-primary text-primary-foreground'
-              : 'max-w-[82%] self-start border border-border bg-card',
+              : 'max-w-[min(82%,520px)] self-start border border-border bg-card',
           )}
         >
           {message.content}
