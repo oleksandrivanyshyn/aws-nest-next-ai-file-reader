@@ -42,35 +42,37 @@ export function ChatView() {
           : 'indexed';
 
   return (
-    <div className="mx-auto flex h-svh w-full max-w-[720px] flex-col">
-      <DocumentHeader doc={doc} isUploading={isUploading} />
+    <div className="min-h-svh bg-background md:flex md:items-center md:justify-center md:bg-muted/30 md:p-6">
+      <div className="mx-auto flex h-svh w-full flex-col md:h-[min(860px,88svh)] md:max-w-2xl md:overflow-hidden md:rounded-xl md:border md:border-border md:shadow-sm lg:max-w-3xl">
+        <DocumentHeader doc={doc} isUploading={isUploading} />
 
-      {isLoading ? (
-        <div className="flex flex-1 flex-col gap-3 p-4">
-          <Skeleton className="h-16 w-3/4" />
-          <Skeleton className="ml-auto h-10 w-1/2" />
-        </div>
-      ) : isUploading ? (
-        <UploadProgress percent={progress} onCancel={cancel} />
-      ) : !doc ? (
-        <UploadDropzone onFileSelected={upload} />
-      ) : doc.status === 'pending' ? (
-        <ProcessingSteps currentStep={doc.currentStep} />
-      ) : doc.status === 'error' ? (
-        <ErrorPanel
-          message={doc.errorMessage}
-          onRetry={resetAfterError}
-          onUploadDifferent={resetAfterError}
+        {isLoading ? (
+          <div className="flex flex-1 flex-col gap-3 p-4">
+            <Skeleton className="h-16 w-3/4" />
+            <Skeleton className="ml-auto h-10 w-1/2" />
+          </div>
+        ) : isUploading ? (
+          <UploadProgress percent={progress} onCancel={cancel} />
+        ) : !doc ? (
+          <UploadDropzone onFileSelected={upload} />
+        ) : doc.status === 'pending' ? (
+          <ProcessingSteps currentStep={doc.currentStep} />
+        ) : doc.status === 'error' ? (
+          <ErrorPanel
+            message={doc.errorMessage}
+            onRetry={resetAfterError}
+            onUploadDifferent={resetAfterError}
+          />
+        ) : (
+          <MessageList messages={messages} />
+        )}
+
+        <ChatComposer
+          disabled={composerState !== 'indexed' || isAsking}
+          placeholder={COMPOSER_PLACEHOLDER[composerState]}
+          onSend={ask}
         />
-      ) : (
-        <MessageList messages={messages} />
-      )}
-
-      <ChatComposer
-        disabled={composerState !== 'indexed' || isAsking}
-        placeholder={COMPOSER_PLACEHOLDER[composerState]}
-        onSend={ask}
-      />
+      </div>
     </div>
   );
 }

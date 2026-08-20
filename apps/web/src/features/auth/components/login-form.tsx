@@ -29,8 +29,8 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center p-6">
-      <div className="w-full max-w-[280px] space-y-6">
+    <div className="flex min-h-svh items-center justify-center p-6 md:bg-muted/30">
+      <div className="w-full max-w-[280px] space-y-6 md:rounded-xl md:border md:border-border md:bg-card md:p-8 md:shadow-sm">
         <div className="space-y-1">
           <h1 className="text-xl font-bold tracking-tight">
             Doc<span className="text-primary">chat</span>
