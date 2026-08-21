@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { awsConfig } from '../../config/aws.config';
 import { DynamoDbService } from '../../integrations/aws/dynamodb.service';
 import { DocumentsRepository } from './documents.repository';
-import { DOCUMENT_STATUS, DocumentRow } from './documents.types';
+import { DOCUMENT_STATUS, type DocumentRow } from './documents.constants';
 
 describe('DocumentsRepository', () => {
   let repository: DocumentsRepository;

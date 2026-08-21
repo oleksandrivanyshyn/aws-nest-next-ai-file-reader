@@ -15,7 +15,7 @@ import {
 } from './chat.constants';
 import type { AskQuestionDto } from './dto/requests/ask-question.dto';
 import type { AnswerResponseDto } from './dto/responses/answer.dto';
-import { DOCUMENT_STATUS } from '../documents/documents.types';
+import { DOCUMENT_STATUS } from '../documents/documents.constants';
 
 @Injectable()
 export class ChatService {

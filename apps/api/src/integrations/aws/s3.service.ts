@@ -21,7 +21,6 @@ export class S3Service {
     key: string,
     contentType: string,
     contentLength: number,
-    email: string,
     expiresIn = 300,
   ): Promise<string> {
     const command = new PutObjectCommand({
@@ -29,18 +28,11 @@ export class S3Service {
       Key: key,
       ContentType: contentType,
       ContentLength: contentLength,
-      Metadata: {
-        email,
-      },
     });
 
     return getSignedUrl(this.s3Client, command, {
       expiresIn,
-      signableHeaders: new Set([
-        'content-type',
-        'content-length',
-        'x-amz-meta-email',
-      ]),
+      signableHeaders: new Set(['content-type', 'content-length']),
     });
   }
 

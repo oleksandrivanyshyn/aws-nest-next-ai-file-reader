@@ -2,8 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { awsConfig } from '../../config/aws.config';
 import { DynamoDbService } from '../../integrations/aws/dynamodb.service';
-
-import { DocumentRow } from './documents.types';
+import type { DocumentRow } from './documents.constants';
 
 @Injectable()
 export class DocumentsRepository {

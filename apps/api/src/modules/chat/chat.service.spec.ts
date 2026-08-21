@@ -9,7 +9,7 @@ import {
   TOP_K,
 } from './chat.constants';
 import { ChatService } from './chat.service';
-import { DOCUMENT_STATUS } from '../documents/documents.types';
+import { DOCUMENT_STATUS } from '../documents/documents.constants';
 
 describe('ChatService', () => {
   let service: ChatService;

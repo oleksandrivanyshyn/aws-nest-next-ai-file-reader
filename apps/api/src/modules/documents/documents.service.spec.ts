@@ -2,10 +2,10 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { S3Service } from '../../integrations/aws/s3.service';
 import { PineconeService } from '../../integrations/pinecone/pinecone.service';
+import { DOCUMENT_STATUS, type DocumentRow } from './documents.constants';
 import { DocumentsRepository } from './documents.repository';
 import { DocumentsService } from './documents.service';
 import type { CreateUploadUrlDto } from './dto/requests/create-upload-url.dto';
-import { DOCUMENT_STATUS, DocumentRow } from './documents.types';
 
 describe('DocumentsService', () => {
   let service: DocumentsService;
@@ -26,7 +26,7 @@ describe('DocumentsService', () => {
     userEmail: 'user@example.com',
     documentId: 'doc-123',
     fileName: 'resume.pdf',
-    s3Key: 'uploads/doc-123.pdf',
+    s3Key: 'uploads/user@example.com/doc-123.pdf',
     status: DOCUMENT_STATUS.PENDING,
     createdAt: '2026-08-21T10:00:00.000Z',
     updatedAt: '2026-08-21T10:00:00.000Z',
@@ -84,10 +84,9 @@ describe('DocumentsService', () => {
       const result = await service.createUploadUrl(uploadDto);
 
       expect(mockS3Service.createPresignedPutUrl).toHaveBeenCalledWith(
-        expect.stringMatching(/^uploads\/.+\.pdf$/),
+        expect.stringMatching(/^uploads\/user@example\.com\/.+\.pdf$/),
         'application/pdf',
         1024 * 1024,
-        'user@example.com',
         300,
       );
       expect(mockDocumentsRepository.create).toHaveBeenCalledWith(
@@ -167,7 +166,7 @@ describe('DocumentsService', () => {
 
       expect(callOrder).toEqual(['s3', 'pinecone', 'repository']);
       expect(mockS3Service.deleteObject).toHaveBeenCalledWith(
-        'uploads/doc-123.pdf',
+        'uploads/user@example.com/doc-123.pdf',
       );
       expect(mockPineconeService.deleteNamespace).toHaveBeenCalledWith(
         'user@example.com',
