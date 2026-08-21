@@ -66,7 +66,6 @@ export function ChatView() {
           <UploadDropzone onFileSelected={upload} />
         ) : isDocProcessing ? (
           <ProcessingSteps
-            currentStep={doc.currentStep}
             onCancel={removeDocument}
             isCancelling={deleteDocument.isPending}
           />
