@@ -1,0 +1,90 @@
+service: pdf-rag-ingestion
+
+frameworkVersion: '4'
+
+useDotenv: true
+
+plugins:
+  - serverless-step-functions
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  architecture: arm64
+  region: ${env:AWS_REGION}
+  stage: ${opt:stage, 'dev'}
+
+  memorySize: 1024
+  timeout: 300
+  logRetentionInDays: 14
+
+  environment:
+    BUCKET_NAME: ${env:S3_BUCKET_NAME}
+    TABLE_NAME: ${env:DYNAMODB_TABLE_NAME}
+
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+    OPENAI_EMBEDDING_MODEL: ${env:OPENAI_EMBEDDING_MODEL}
+    EMBEDDING_DIMENSIONS: ${env:EMBEDDING_DIMENSIONS}
+
+    PINECONE_API_KEY: ${env:PINECONE_API_KEY}
+    PINECONE_INDEX_NAME: ${env:PINECONE_INDEX_NAME}
+
+    CHUNK_SIZE: '800'
+    CHUNK_OVERLAP: '150'
+    EMBED_BATCH_SIZE: '96'
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+          Resource: arn:aws:s3:::${env:S3_BUCKET_NAME}/*
+
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+          Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:DYNAMODB_TABLE_NAME}
+
+build:
+  esbuild:
+    bundle: true
+    minify: true
+    target: node22
+    external:
+      - '@aws-sdk/*'
+
+functions:
+  extractText:
+    handler: src/handlers/extract-text.handler
+    memorySize: 1536
+    timeout: 120
+
+  chunkText:
+    handler: src/handlers/chunk-text.handler
+    memorySize: 512
+    timeout: 60
+
+  embedChunks:
+    handler: src/handlers/embed-chunks.handler
+    timeout: 900
+
+  indexChunks:
+    handler: src/handlers/index-chunks.handler
+    timeout: 300
+
+  updateSuccess:
+    handler: src/handlers/update-success.handler
+    memorySize: 256
+    timeout: 30
+
+  updateError:
+    handler: src/handlers/update-error.handler
+    memorySize: 256
+    timeout: 30
+
+stepFunctions:
+  stateMachines:
+    ingestion: ${file(./state-machine.yml)}

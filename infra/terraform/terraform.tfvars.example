@@ -1,0 +1,5 @@
+aws_region   = "us-east-1"
+project_name = "pdf-rag"
+environment  = "dev"
+
+cors_allowed_origins = ["http://localhost:3000"]

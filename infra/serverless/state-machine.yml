@@ -1,0 +1,142 @@
+name: ${self:service}-${sls:stage}
+
+events:
+  - eventBridge:
+      event:
+        source:
+          - aws.s3
+        detail-type:
+          - Object Created
+        detail:
+          bucket:
+            name:
+              - ${env:S3_BUCKET_NAME}
+          object:
+            key:
+              - prefix: uploads/
+
+      inputTransformer:
+        inputPathsMap:
+          bucket: '$.detail.bucket.name'
+          key: '$.detail.object.key'
+        inputTemplate: '{"bucket": <bucket>, "key": <key>}'
+
+definition:
+  Comment: Extract, chunk, embed and index an uploaded PDF.
+  StartAt: ExtractText
+
+  States:
+    ExtractText:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [ExtractTextLambdaFunction, Arn]
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+            - Lambda.TooManyRequestsException
+          IntervalSeconds: 2
+          MaxAttempts: 3
+          BackoffRate: 2
+      Catch:
+        - ErrorEquals: [States.ALL]
+          ResultPath: $.error
+          Next: UpdateStatusError
+      Next: ChunkText
+
+    ChunkText:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [ChunkTextLambdaFunction, Arn]
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+            - Lambda.TooManyRequestsException
+          IntervalSeconds: 2
+          MaxAttempts: 3
+          BackoffRate: 2
+      Catch:
+        - ErrorEquals: [States.ALL]
+          ResultPath: $.error
+          Next: UpdateStatusError
+      Next: EmbedChunks
+
+    EmbedChunks:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [EmbedChunksLambdaFunction, Arn]
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+            - Lambda.TooManyRequestsException
+          IntervalSeconds: 2
+          MaxAttempts: 3
+          BackoffRate: 2
+        - ErrorEquals: [RateLimitError]
+          IntervalSeconds: 20
+          MaxAttempts: 4
+          BackoffRate: 2
+      Catch:
+        - ErrorEquals: [States.ALL]
+          ResultPath: $.error
+          Next: UpdateStatusError
+      Next: IndexChunks
+
+    IndexChunks:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [IndexChunksLambdaFunction, Arn]
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+            - Lambda.TooManyRequestsException
+          IntervalSeconds: 2
+          MaxAttempts: 3
+          BackoffRate: 2
+      Catch:
+        - ErrorEquals: [States.ALL]
+          ResultPath: $.error
+          Next: UpdateStatusError
+      Next: UpdateStatusSuccess
+
+    UpdateStatusSuccess:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [UpdateSuccessLambdaFunction, Arn]
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+            - Lambda.TooManyRequestsException
+          IntervalSeconds: 2
+          MaxAttempts: 3
+          BackoffRate: 2
+      End: true
+
+    UpdateStatusError:
+      Type: Task
+      Resource:
+        Fn::GetAtt: [UpdateErrorLambdaFunction, Arn]
+      Retry:
+        - ErrorEquals:
+            - Lambda.ServiceException
+            - Lambda.AWSLambdaException
+            - Lambda.SdkClientException
+            - Lambda.TooManyRequestsException
+          IntervalSeconds: 2
+          MaxAttempts: 3
+          BackoffRate: 2
+      Next: IngestionFailed
+
+    IngestionFailed:
+      Type: Fail
+      Error: IngestionFailed
+      Cause: See the UpdateStatusError step and the document record for details.
