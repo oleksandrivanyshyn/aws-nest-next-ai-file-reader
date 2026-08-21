@@ -21,3 +21,15 @@ variable "cors_allowed_origins" {
   type        = list(string)
   default     = ["http://localhost:3000"]
 }
+
+variable "app_port" {
+  description = "Port the NestJS API listens on. Must match apps/api/.env PORT."
+  type        = number
+  default     = 5000
+}
+
+variable "instance_type" {
+  description = "EC2 instance size for the backend."
+  type        = string
+  default     = "t3.micro"
+}

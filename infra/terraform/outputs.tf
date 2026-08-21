@@ -18,6 +18,21 @@ output "backend_policy_arn" {
   value       = aws_iam_policy.backend.arn
 }
 
+output "ec2_instance_id" {
+  description = "Connect with: aws ssm start-session --target <this>."
+  value       = aws_instance.backend.id
+}
+
+output "ec2_public_ip" {
+  description = "The backend's Elastic IP. Not meant to be hit directly -- traffic should go through CloudFront."
+  value       = aws_eip.backend.public_ip
+}
+
+output "cloudfront_domain_name" {
+  description = "Public HTTPS endpoint for the backend API."
+  value       = aws_cloudfront_distribution.backend.domain_name
+}
+
 output "env_snippet" {
   description = "Paste into apps/api/.env and infra/serverless/.env."
 
@@ -36,40 +51,14 @@ resource "terraform_data" "sync_env_files" {
   ]
 
   provisioner "local-exec" {
-    command = <<-EOT
-      node -e "
-        const fs = require('fs');
-        const paths = ['${local.api_env_path}', '${local.serverless_env_path}'];
-        const updates = {
-          AWS_REGION: '${var.aws_region}',
-          S3_BUCKET_NAME: '${aws_s3_bucket.documents.bucket}',
-          DYNAMODB_TABLE_NAME: '${aws_dynamodb_table.user_documents.name}',
-        };
+    command = "node ${path.module}/scripts/sync-env.js"
 
-        for (const p of paths) {
-          let content = '';
-          if (fs.existsSync(p)) {
-            content = fs.readFileSync(p, 'utf8');
-          } else {
-            const examplePath = p.endsWith('.env') ? p + '.example' : p;
-            if (fs.existsSync(examplePath)) {
-              content = fs.readFileSync(examplePath, 'utf8');
-            }
-          }
-
-          for (const [key, val] of Object.entries(updates)) {
-            const regex = new RegExp('^' + key + '=.*$', 'm');
-            if (regex.test(content)) {
-              content = content.replace(regex, key + '=' + val);
-            } else {
-              content += '\n' + key + '=' + val;
-            }
-          }
-
-          fs.writeFileSync(p, content.trim() + '\n', 'utf8');
-          console.log('Synchronized AWS config into ' + p);
-        }
-      "
-    EOT
+    environment = {
+      API_ENV_PATH        = local.api_env_path
+      SERVERLESS_ENV_PATH = local.serverless_env_path
+      AWS_REGION          = var.aws_region
+      S3_BUCKET_NAME      = aws_s3_bucket.documents.bucket
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.user_documents.name
+    }
   }
 }
