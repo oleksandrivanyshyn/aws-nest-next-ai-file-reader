@@ -7,7 +7,9 @@ import { documentsApi } from '../api/chat.api';
 import type { ChatMessage } from '../types/chat.types';
 
 export function useChat(documentId: string | undefined) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [histories, setHistories] = useState<Record<string, ChatMessage[]>>({});
+
+  const messages = (documentId ? histories[documentId] : undefined) ?? [];
 
   const mutation = useMutation({
     mutationFn: (question: string) => {
@@ -17,17 +19,28 @@ export function useChat(documentId: string | undefined) {
       return documentsApi.ask(question);
     },
     onMutate: (question) => {
-      setMessages((prev) => [...prev, { role: 'user', content: question }]);
+      if (!documentId) return;
+      setHistories((prev) => ({
+        ...prev,
+        [documentId]: [
+          ...(prev[documentId] ?? []),
+          { role: 'user', content: question },
+        ],
+      }));
     },
     onSuccess: (data) => {
-      setMessages((prev) => [
+      if (!documentId) return;
+      setHistories((prev) => ({
         ...prev,
-        {
-          role: 'assistant',
-          content: data.answer,
-          sourceClause: data.sourceClause,
-        },
-      ]);
+        [documentId]: [
+          ...(prev[documentId] ?? []),
+          {
+            role: 'assistant',
+            content: data.answer,
+            sourceClause: data.sourceClause,
+          },
+        ],
+      }));
     },
     onError: (error) => {
       toast.add({

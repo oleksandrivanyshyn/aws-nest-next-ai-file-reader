@@ -10,7 +10,7 @@ export function useDeleteDocument() {
   return useMutation({
     mutationFn: () => documentsApi.remove(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: documentKeys.current });
+      queryClient.invalidateQueries({ queryKey: documentKeys.all });
     },
     onError: (error) => {
       toast.add({

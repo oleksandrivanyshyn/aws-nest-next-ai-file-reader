@@ -25,7 +25,8 @@ interface BackendAskResponse {
 }
 
 export const documentKeys = {
-  current: ['document', 'current'] as const,
+  all: ['document'] as const,
+  current: (email?: string | null) => ['document', email ?? 'current'] as const,
 };
 
 export const documentsApi = {

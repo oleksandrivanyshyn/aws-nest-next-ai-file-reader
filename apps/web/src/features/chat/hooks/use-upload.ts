@@ -32,11 +32,11 @@ export function useUpload() {
         signal: abortRef.current.signal,
       });
 
-      await queryClient.invalidateQueries({ queryKey: documentKeys.current });
+      await queryClient.invalidateQueries({ queryKey: documentKeys.all });
     } catch (error) {
       if (uploadUrlCreated) {
         await documentsApi.remove().catch(() => {});
-        await queryClient.invalidateQueries({ queryKey: documentKeys.current });
+        await queryClient.invalidateQueries({ queryKey: documentKeys.all });
       }
 
       if (error instanceof DOMException && error.name === 'AbortError') {
