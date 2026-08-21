@@ -23,7 +23,7 @@ const COMPOSER_PLACEHOLDER = {
 
 export function ChatView() {
   const { data: doc, isLoading } = useDocument();
-  const { upload, cancel, progress, isUploading } = useUpload();
+  const { upload, cancel, progress, isUploading, fileName } = useUpload();
   const deleteDocument = useDeleteDocument();
   const { messages, ask, isAsking } = useChat(doc?.id);
 
@@ -50,6 +50,7 @@ export function ChatView() {
         <DocumentHeader
           doc={doc}
           isUploading={isUploading}
+          uploadingFilename={fileName}
           onDelete={removeDocument}
           isDeleting={deleteDocument.isPending}
         />

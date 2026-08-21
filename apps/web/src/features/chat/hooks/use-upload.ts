@@ -9,11 +9,13 @@ export function useUpload() {
   const queryClient = useQueryClient();
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [fileName, setFileName] = useState<string | undefined>(undefined);
   const abortRef = useRef<AbortController | null>(null);
 
   async function upload(file: File) {
     setIsUploading(true);
     setProgress(0);
+    setFileName(file.name);
     abortRef.current = new AbortController();
 
     let uploadUrlCreated = false;
@@ -48,6 +50,7 @@ export function useUpload() {
       });
     } finally {
       setIsUploading(false);
+      setFileName(undefined);
     }
   }
 
@@ -55,5 +58,5 @@ export function useUpload() {
     abortRef.current?.abort();
   }
 
-  return { upload, cancel, progress, isUploading };
+  return { upload, cancel, progress, isUploading, fileName };
 }
