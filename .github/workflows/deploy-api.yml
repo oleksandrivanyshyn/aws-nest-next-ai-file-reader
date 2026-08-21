@@ -1,0 +1,68 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the API image
+        working-directory: apps/api
+        run: docker build -t pdf-rag-api:latest .
+
+      - name: Write env file
+        run: |
+          cat > "$RUNNER_TEMP/apps-api.env" << EOF
+          PORT=5000
+          CORS_ORIGINS=${{ vars.CORS_ORIGINS }}
+          AWS_REGION=${{ vars.AWS_REGION }}
+          S3_BUCKET_NAME=${{ vars.S3_BUCKET_NAME }}
+          DYNAMODB_TABLE_NAME=${{ vars.DYNAMODB_TABLE_NAME }}
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }}
+          GEMINI_EMBEDDING_MODEL=${{ vars.GEMINI_EMBEDDING_MODEL }}
+          EMBEDDING_DIMENSIONS=${{ vars.EMBEDDING_DIMENSIONS }}
+          PINECONE_INDEX_NAME=${{ vars.PINECONE_INDEX_NAME }}
+          GEMINI_CHAT_MODEL=${{ vars.GEMINI_CHAT_MODEL }}
+          EOF
+
+      - name: Restart the API container
+        run: |
+          docker rm -f pdf-rag-api || true
+          docker run -d \
+            --name pdf-rag-api \
+            --restart unless-stopped \
+            -p 5000:5000 \
+            --env-file "$RUNNER_TEMP/apps-api.env" \
+            pdf-rag-api:latest
+          rm -f "$RUNNER_TEMP/apps-api.env"
+
+      - name: Verify the container came up healthy
+        run: |
+          for i in $(seq 1 15); do
+            if curl -fsS http://127.0.0.1:5000/api/health; then
+              echo
+              echo "healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "container did not become healthy"
+          docker logs pdf-rag-api --tail 50
+          exit 1
+
+      - name: Prune old images
+        run: docker image prune -f
