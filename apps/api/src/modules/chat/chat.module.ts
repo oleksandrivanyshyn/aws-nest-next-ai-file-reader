@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { OpenAiModule } from '../../integrations/openai/openai.module';
+import { GeminiModule } from '../../integrations/gemini/gemini.module';
 import { PineconeModule } from '../../integrations/pinecone/pinecone.module';
 import { DocumentsModule } from '../documents/documents.module';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 
 @Module({
-  imports: [DocumentsModule, OpenAiModule, PineconeModule],
+  imports: [DocumentsModule, GeminiModule, PineconeModule],
   controllers: [ChatController],
   providers: [ChatService],
   exports: [ChatService],

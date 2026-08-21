@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { OpenAiService } from '../../integrations/openai/openai.service';
+import { GeminiService } from '../../integrations/gemini/gemini.service';
 import { PineconeService } from '../../integrations/pinecone/pinecone.service';
 import { DocumentsService } from '../documents/documents.service';
 import type { DocumentResponseDto } from '../documents/dto/responses/document.dto';
@@ -21,7 +21,7 @@ import { DOCUMENT_STATUS } from '../documents/documents.constants';
 export class ChatService {
   constructor(
     private readonly documentsService: DocumentsService,
-    private readonly openAiService: OpenAiService,
+    private readonly geminiService: GeminiService,
     private readonly pineconeService: PineconeService,
   ) {}
 
@@ -42,7 +42,7 @@ export class ChatService {
       );
     }
 
-    const embedding = await this.openAiService.createEmbedding(dto.question);
+    const embedding = await this.geminiService.createEmbedding(dto.question);
     const matches = await this.pineconeService.query(
       dto.email,
       embedding,
@@ -68,7 +68,7 @@ export class ChatService {
       userPrompt = `Question: ${dto.question}`;
     }
 
-    const answer = await this.openAiService.createCompletion(
+    const answer = await this.geminiService.createCompletion(
       systemPrompt,
       userPrompt,
     );
