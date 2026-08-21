@@ -2,7 +2,6 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { OpenAiService } from '../../integrations/openai/openai.service';
 import { PineconeService } from '../../integrations/pinecone/pinecone.service';
-import { DOCUMENT_STATUS } from '../documents/documents.constants';
 import { DocumentsService } from '../documents/documents.service';
 import {
   CHAT_SYSTEM_PROMPT_NO_CONTEXT,
@@ -10,6 +9,7 @@ import {
   TOP_K,
 } from './chat.constants';
 import { ChatService } from './chat.service';
+import { DOCUMENT_STATUS } from '../documents/documents.types';
 
 describe('ChatService', () => {
   let service: ChatService;

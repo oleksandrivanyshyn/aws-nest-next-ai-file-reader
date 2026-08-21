@@ -6,11 +6,7 @@ import {
 import { randomUUID } from 'crypto';
 import { S3Service } from '../../integrations/aws/s3.service';
 import { PineconeService } from '../../integrations/pinecone/pinecone.service';
-import {
-  DOCUMENT_STATUS,
-  PRESIGNED_URL_TTL_SECONDS,
-  type DocumentRow,
-} from './documents.constants';
+import { PRESIGNED_URL_TTL_SECONDS } from './documents.constants';
 import { DocumentsRepository } from './documents.repository';
 import type { CreateUploadUrlDto } from './dto/requests/create-upload-url.dto';
 import {
@@ -18,6 +14,7 @@ import {
   toDocumentDto,
 } from './dto/responses/document.dto';
 import type { UploadUrlResponseDto } from './dto/responses/upload-url.dto';
+import { DOCUMENT_STATUS, DocumentRow } from './documents.types';
 
 @Injectable()
 export class DocumentsService {

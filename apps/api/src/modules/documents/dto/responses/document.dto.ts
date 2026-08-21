@@ -1,4 +1,4 @@
-import type { DocumentRow, DocumentStatus } from '../../documents.constants';
+import { DocumentRow, DocumentStatus } from '../../documents.types';
 
 export class DocumentResponseDto {
   documentId!: string;

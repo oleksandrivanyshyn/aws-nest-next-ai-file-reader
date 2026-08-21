@@ -2,10 +2,10 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { S3Service } from '../../integrations/aws/s3.service';
 import { PineconeService } from '../../integrations/pinecone/pinecone.service';
-import { DOCUMENT_STATUS, type DocumentRow } from './documents.constants';
 import { DocumentsRepository } from './documents.repository';
 import { DocumentsService } from './documents.service';
 import type { CreateUploadUrlDto } from './dto/requests/create-upload-url.dto';
+import { DOCUMENT_STATUS, DocumentRow } from './documents.types';
 
 describe('DocumentsService', () => {
   let service: DocumentsService;

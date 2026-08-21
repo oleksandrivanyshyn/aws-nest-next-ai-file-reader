@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { OpenAiService } from '../../integrations/openai/openai.service';
 import { PineconeService } from '../../integrations/pinecone/pinecone.service';
-import { DOCUMENT_STATUS } from '../documents/documents.constants';
 import { DocumentsService } from '../documents/documents.service';
 import type { DocumentResponseDto } from '../documents/dto/responses/document.dto';
 import {
@@ -16,6 +15,7 @@ import {
 } from './chat.constants';
 import type { AskQuestionDto } from './dto/requests/ask-question.dto';
 import type { AnswerResponseDto } from './dto/responses/answer.dto';
+import { DOCUMENT_STATUS } from '../documents/documents.types';
 
 @Injectable()
 export class ChatService {
