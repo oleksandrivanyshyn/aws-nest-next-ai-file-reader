@@ -10,7 +10,7 @@ export const pineconeClientProvider: Provider = {
   inject: [pineconeConfig.KEY],
   useFactory: (config: ConfigType<typeof pineconeConfig>): Pinecone => {
     return new Pinecone({
-      apiKey: config.apiKey ?? '',
+      apiKey: config.apiKey || 'placeholder-key',
     });
   },
 };

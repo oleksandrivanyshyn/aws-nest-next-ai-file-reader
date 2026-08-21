@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { awsConfig } from './config/aws.config';
 import { pineconeConfig } from './config/pinecone.config';
 import { serverConfig } from './config/server.config';
+import { DocumentsModule } from './modules/documents/documents.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { serverConfig } from './config/server.config';
       isGlobal: true,
       load: [serverConfig, awsConfig, pineconeConfig],
     }),
+    DocumentsModule,
   ],
   controllers: [AppController],
 })
