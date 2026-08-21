@@ -28,7 +28,7 @@ export class DynamoDbService {
     return (result.Item as T) ?? null;
   }
 
-  async putIfAbsent<T extends Record<string, unknown>>(
+  async putIfAbsent<T extends object>(
     tableName: string,
     item: T,
     conditionAttribute: string,
