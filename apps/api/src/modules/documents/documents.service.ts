@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { S3Service } from '../../integrations/aws/s3.service';
 import { PineconeService } from '../../integrations/pinecone/pinecone.service';
 import {
@@ -30,7 +30,7 @@ export class DocumentsService {
   async createUploadUrl(
     dto: CreateUploadUrlDto,
   ): Promise<UploadUrlResponseDto> {
-    const documentId = uuidv4();
+    const documentId = randomUUID();
     const s3Key = `uploads/${documentId}.pdf`;
 
     const uploadUrl = await this.s3Service.createPresignedPutUrl(
