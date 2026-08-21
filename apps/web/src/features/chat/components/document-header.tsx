@@ -19,16 +19,16 @@ export function DocumentHeader({
 }: DocumentHeaderProps) {
   const filename = doc?.filename ?? uploadingFilename ?? 'No document';
   const meta = doc
-    ? `${formatSize(doc.sizeBytes)}${doc.pageCount ? ` · ${doc.pageCount} pages` : ''}`
+    ? `${doc.sizeBytes ? formatSize(doc.sizeBytes) : 'PDF document'}${doc.pageCount ? ` · ${doc.pageCount} pages` : ''}`
     : 'PDF, up to 10 MB';
 
   const { label, tone, iconOn } = (() => {
     if (isUploading)
       return { label: 'Uploading', tone: 'warn' as const, iconOn: false };
     if (!doc) return { label: 'Waiting', tone: 'idle' as const, iconOn: false };
-    if (doc.status === 'pending')
+    if (doc.status === 'PENDING' || doc.status === 'PROCESSING')
       return { label: 'Processing', tone: 'warn' as const, iconOn: false };
-    if (doc.status === 'error')
+    if (doc.status === 'ERROR')
       return { label: 'Failed', tone: 'error' as const, iconOn: false };
     return { label: 'Ready', tone: 'ok' as const, iconOn: true };
   })();
@@ -39,14 +39,14 @@ export function DocumentHeader({
         <div
           className={
             'grid size-8 md:size-10 shrink-0 place-items-center rounded text-[10px] md:text-xs font-bold tracking-wide ' +
-            (doc?.status === 'error'
+            (doc?.status === 'ERROR'
               ? 'bg-destructive/15 text-destructive'
               : iconOn
                 ? 'bg-ok-bg text-primary'
                 : 'bg-muted text-muted-foreground')
           }
         >
-          {doc?.status === 'error' ? (
+          {doc?.status === 'ERROR' ? (
             <FileWarning className="size-4 md:size-5" />
           ) : (
             <FileText className="size-4 md:size-5" />

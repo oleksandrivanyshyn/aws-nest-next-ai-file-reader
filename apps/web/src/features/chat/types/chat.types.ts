@@ -1,15 +1,20 @@
-export type DocumentStatus = 'pending' | 'indexed' | 'error';
+export type DocumentStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'SUCCESS'
+  | 'ERROR';
 
 export type ProcessingStep = 'extract' | 'chunk' | 'embed' | 'index';
 
 export interface DocumentDto {
   id: string;
   filename: string;
-  sizeBytes: number;
+  sizeBytes?: number;
   status: DocumentStatus;
   currentStep?: ProcessingStep;
   errorMessage?: string;
   pageCount?: number;
+  createdAt?: string;
 }
 
 export interface UploadUrlResponse {

@@ -1,18 +1,32 @@
+import { ApiError, client } from '@/services/fetch-client';
+import { useSessionStore } from '@/store/session.store';
 import type {
   AskResponse,
   DocumentDto,
+  DocumentStatus,
   UploadUrlResponse,
 } from '../types/chat.types';
+
+interface BackendDocumentResponse {
+  documentId: string;
+  fileName: string;
+  status: DocumentStatus;
+  errorMessage?: string;
+  createdAt: string;
+}
+
+interface BackendUploadUrlResponse {
+  uploadUrl: string;
+  documentId: string;
+}
+
+interface BackendAskResponse {
+  answer: string;
+}
 
 export const documentKeys = {
   current: ['document', 'current'] as const,
 };
-
-let currentDocument: DocumentDto | null = null;
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 export const documentsApi = {
   createUploadUrl: async (input: {
@@ -20,82 +34,123 @@ export const documentsApi = {
     contentType: string;
     size: number;
   }): Promise<UploadUrlResponse> => {
-    await delay(150);
-    const documentId = crypto.randomUUID();
-    currentDocument = {
-      id: documentId,
-      filename: input.filename,
-      sizeBytes: input.size,
-      status: 'pending',
-      currentStep: 'extract',
+    const email = useSessionStore.getState().email;
+    if (!email) {
+      throw new Error('User is not authenticated');
+    }
+
+    const response = await client<BackendUploadUrlResponse>(
+      '/documents/upload-url',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          email,
+          fileName: input.filename,
+          fileType: input.contentType,
+          fileSize: input.size,
+        }),
+      },
+    );
+
+    return {
+      documentId: response.documentId,
+      uploadUrl: response.uploadUrl,
     };
-    return { documentId, uploadUrl: 'placeholder://upload' };
   },
 
   uploadToS3: (
     uploadUrl: string,
     file: File,
     options?: { onProgress?: (percent: number) => void; signal?: AbortSignal },
-  ) =>
+  ): Promise<void> =>
     new Promise<void>((resolve, reject) => {
-      let percent = 0;
-      const interval = setInterval(() => {
-        percent = Math.min(100, percent + 20);
-        options?.onProgress?.(percent);
-        if (percent >= 100) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 150);
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', uploadUrl);
+      xhr.setRequestHeader('Content-Type', file.type);
 
-      options?.signal?.addEventListener('abort', () => {
-        clearInterval(interval);
-        currentDocument = null;
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && options?.onProgress) {
+          const percent = Math.round((event.loaded / event.total) * 100);
+          options.onProgress(percent);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          options?.onProgress?.(100);
+          resolve();
+        } else {
+          reject(new Error(`S3 upload failed with status ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () =>
+        reject(new Error('Network error during upload to S3'));
+      xhr.onabort = () =>
         reject(new DOMException('Upload cancelled', 'AbortError'));
-      });
+
+      if (options?.signal) {
+        options.signal.addEventListener('abort', () => xhr.abort());
+      }
+
+      xhr.send(file);
     }),
 
   getCurrent: async (): Promise<DocumentDto | null> => {
-    await delay(100);
-    return currentDocument;
-  },
+    const email = useSessionStore.getState().email;
+    if (!email) {
+      return null;
+    }
 
-  remove: async (documentId: string): Promise<void> => {
-    await delay(100);
-    if (currentDocument?.id === documentId) {
-      currentDocument = null;
+    try {
+      const doc = await client<BackendDocumentResponse>('/documents', {
+        method: 'GET',
+        params: { email },
+      });
+
+      return {
+        id: doc.documentId,
+        filename: doc.fileName,
+        status: doc.status,
+        errorMessage: doc.errorMessage,
+        createdAt: doc.createdAt,
+      };
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
+      throw error;
     }
   },
 
-  ask: async (documentId: string, question: string): Promise<AskResponse> => {
-    await delay(600);
+  remove: async (): Promise<void> => {
+    const email = useSessionStore.getState().email;
+    if (!email) {
+      return;
+    }
+
+    await client<void>('/documents', {
+      method: 'DELETE',
+      params: { email },
+    });
+  },
+
+  ask: async (question: string): Promise<AskResponse> => {
+    const email = useSessionStore.getState().email;
+    if (!email) {
+      throw new Error('User is not authenticated');
+    }
+
+    const response = await client<BackendAskResponse>('/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+        question,
+      }),
+    });
+
     return {
-      answer: `This is a placeholder answer for "${question}" — the backend isn't wired up yet.`,
-      sourceClause: 'clause 1.1',
+      answer: response.answer,
     };
   },
 };
-
-const STEPS: DocumentDto['currentStep'][] = [
-  'extract',
-  'chunk',
-  'embed',
-  'index',
-];
-
-setInterval(() => {
-  if (currentDocument?.status !== 'pending' || !currentDocument.currentStep)
-    return;
-
-  const index = STEPS.indexOf(currentDocument.currentStep);
-  if (index < STEPS.length - 1) {
-    currentDocument = { ...currentDocument, currentStep: STEPS[index + 1] };
-  } else {
-    currentDocument = {
-      ...currentDocument,
-      status: 'indexed',
-      currentStep: undefined,
-      pageCount: 12,
-    };
-  }
-}, 2500);

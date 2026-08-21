@@ -16,7 +16,7 @@ import { useChat } from '../hooks/use-chat';
 const COMPOSER_PLACEHOLDER = {
   none: 'Upload a document to start asking questions…',
   uploading: 'Chat unlocks once the document is ready…',
-  pending: 'Chat unlocks when indexing finishes…',
+  processing: 'Chat unlocks when indexing finishes…',
   error: 'Chat unlocks once a document is ready…',
   indexed: 'Ask something about this document…',
 } as const;
@@ -28,16 +28,19 @@ export function ChatView() {
   const { messages, ask, isAsking } = useChat(doc?.id);
 
   function resetAfterError() {
-    if (doc) deleteDocument.mutate(doc.id);
+    if (doc) deleteDocument.mutate();
   }
+
+  const isDocProcessing =
+    doc?.status === 'PENDING' || doc?.status === 'PROCESSING';
 
   const composerState = isUploading
     ? 'uploading'
     : !doc
       ? 'none'
-      : doc.status === 'pending'
-        ? 'pending'
-        : doc.status === 'error'
+      : isDocProcessing
+        ? 'processing'
+        : doc.status === 'ERROR'
           ? 'error'
           : 'indexed';
 
@@ -55,9 +58,9 @@ export function ChatView() {
           <UploadProgress percent={progress} onCancel={cancel} />
         ) : !doc ? (
           <UploadDropzone onFileSelected={upload} />
-        ) : doc.status === 'pending' ? (
+        ) : isDocProcessing ? (
           <ProcessingSteps currentStep={doc.currentStep} />
-        ) : doc.status === 'error' ? (
+        ) : doc.status === 'ERROR' ? (
           <ErrorPanel
             message={doc.errorMessage}
             onRetry={resetAfterError}

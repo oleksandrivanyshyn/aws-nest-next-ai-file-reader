@@ -5,5 +5,6 @@ const schema = z.object({
 });
 
 export const env = schema.parse({
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NEXT_PUBLIC_API_URL:
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
 });

@@ -8,7 +8,7 @@ export function useDeleteDocument() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: documentsApi.remove,
+    mutationFn: () => documentsApi.remove(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: documentKeys.current });
     },

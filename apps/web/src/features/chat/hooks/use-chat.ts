@@ -14,7 +14,7 @@ export function useChat(documentId: string | undefined) {
       if (!documentId) {
         return Promise.reject(new Error('No document to ask about yet.'));
       }
-      return documentsApi.ask(documentId, question);
+      return documentsApi.ask(question);
     },
     onMutate: (question) => {
       setMessages((prev) => [...prev, { role: 'user', content: question }]);

@@ -7,7 +7,9 @@ export function useDocument() {
   return useQuery({
     queryKey: documentKeys.current,
     queryFn: documentsApi.getCurrent,
-    refetchInterval: (query) =>
-      query.state.data?.status === 'pending' ? 2000 : false,
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === 'PENDING' || status === 'PROCESSING' ? 2000 : false;
+    },
   });
 }
