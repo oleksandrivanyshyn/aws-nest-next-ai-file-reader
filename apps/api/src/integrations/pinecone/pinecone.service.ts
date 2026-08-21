@@ -19,7 +19,11 @@ export class PineconeService {
 
   async deleteNamespace(namespace: string): Promise<void> {
     const index = this.pineconeClient.index(this.config.indexName ?? '');
-    await index.namespace(namespace).deleteAll();
+    try {
+      await index.namespace(namespace).deleteAll();
+    } catch {
+      return;
+    }
   }
 
   async query(
