@@ -7,7 +7,10 @@ import { serverConfig } from './config/server.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [serverConfig, awsConfig, pineconeConfig] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [serverConfig, awsConfig, pineconeConfig],
+    }),
   ],
   controllers: [AppController],
 })
