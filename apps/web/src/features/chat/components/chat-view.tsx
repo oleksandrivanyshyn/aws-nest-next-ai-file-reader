@@ -27,8 +27,8 @@ export function ChatView() {
   const deleteDocument = useDeleteDocument();
   const { messages, ask, isAsking } = useChat(doc?.id);
 
-  function resetAfterError() {
-    if (doc) deleteDocument.mutate();
+  function removeDocument() {
+    deleteDocument.mutate();
   }
 
   const isDocProcessing =
@@ -47,7 +47,12 @@ export function ChatView() {
   return (
     <div className="min-h-svh bg-background md:flex md:items-center md:justify-center md:bg-muted/30 md:p-6">
       <div className="mx-auto flex h-svh w-full flex-col md:h-[min(900px,90svh)] md:max-w-2xl md:overflow-hidden md:rounded-xl md:border md:border-border md:shadow-sm lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
-        <DocumentHeader doc={doc} isUploading={isUploading} />
+        <DocumentHeader
+          doc={doc}
+          isUploading={isUploading}
+          onDelete={removeDocument}
+          isDeleting={deleteDocument.isPending}
+        />
 
         {isLoading ? (
           <div className="flex flex-1 flex-col gap-3 p-4 md:gap-4 md:p-6">
@@ -59,12 +64,16 @@ export function ChatView() {
         ) : !doc ? (
           <UploadDropzone onFileSelected={upload} />
         ) : isDocProcessing ? (
-          <ProcessingSteps currentStep={doc.currentStep} />
+          <ProcessingSteps
+            currentStep={doc.currentStep}
+            onCancel={removeDocument}
+            isCancelling={deleteDocument.isPending}
+          />
         ) : doc.status === 'ERROR' ? (
           <ErrorPanel
             message={doc.errorMessage}
-            onRetry={resetAfterError}
-            onUploadDifferent={resetAfterError}
+            onRetry={removeDocument}
+            onUploadDifferent={removeDocument}
           />
         ) : (
           <MessageList messages={messages} />

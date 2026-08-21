@@ -1,4 +1,5 @@
-import { FileText, FileWarning } from 'lucide-react';
+import { FileText, FileWarning, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { StatusChip } from './status-chip';
 import type { DocumentDto } from '../types/chat.types';
 
@@ -6,6 +7,8 @@ interface DocumentHeaderProps {
   doc: DocumentDto | null | undefined;
   isUploading: boolean;
   uploadingFilename?: string;
+  onDelete?: () => void;
+  isDeleting?: boolean;
 }
 
 function formatSize(bytes: number) {
@@ -16,6 +19,8 @@ export function DocumentHeader({
   doc,
   isUploading,
   uploadingFilename,
+  onDelete,
+  isDeleting,
 }: DocumentHeaderProps) {
   const filename = doc?.filename ?? uploadingFilename ?? 'No document';
   const meta = doc
@@ -59,7 +64,23 @@ export function DocumentHeader({
           <div className="text-xs md:text-sm text-muted-foreground">{meta}</div>
         </div>
       </div>
-      <StatusChip label={label} tone={tone} />
+
+      <div className="flex items-center gap-2">
+        <StatusChip label={label} tone={tone} />
+        {doc && onDelete && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={isDeleting || isUploading}
+            onClick={onDelete}
+            title="Delete document"
+            className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive md:size-9"
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

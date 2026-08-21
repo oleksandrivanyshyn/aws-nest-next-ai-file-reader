@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ProcessingStep } from '../types/chat.types';
 
@@ -11,9 +12,15 @@ const STEPS: { key: ProcessingStep; label: string }[] = [
 
 interface ProcessingStepsProps {
   currentStep?: ProcessingStep;
+  onCancel?: () => void;
+  isCancelling?: boolean;
 }
 
-export function ProcessingSteps({ currentStep }: ProcessingStepsProps) {
+export function ProcessingSteps({
+  currentStep,
+  onCancel,
+  isCancelling,
+}: ProcessingStepsProps) {
   const currentIndex = currentStep
     ? STEPS.findIndex((s) => s.key === currentStep)
     : -1;
@@ -56,6 +63,19 @@ export function ProcessingSteps({ currentStep }: ProcessingStepsProps) {
           ? 'Usually under a minute.'
           : 'Processing your document…'}
       </p>
+
+      {onCancel && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={isCancelling}
+          onClick={onCancel}
+          className="mt-6 md:h-9 md:px-4 md:text-sm"
+        >
+          {isCancelling ? 'Cancelling…' : 'Cancel & upload different file'}
+        </Button>
+      )}
     </div>
   );
 }

@@ -16,12 +16,14 @@ export function useUpload() {
     setProgress(0);
     abortRef.current = new AbortController();
 
+    let uploadUrlCreated = false;
     try {
       const { uploadUrl } = await documentsApi.createUploadUrl({
         filename: file.name,
         contentType: file.type,
         size: file.size,
       });
+      uploadUrlCreated = true;
 
       await documentsApi.uploadToS3(uploadUrl, file, {
         onProgress: setProgress,
@@ -30,6 +32,11 @@ export function useUpload() {
 
       await queryClient.invalidateQueries({ queryKey: documentKeys.current });
     } catch (error) {
+      if (uploadUrlCreated) {
+        await documentsApi.remove().catch(() => {});
+        await queryClient.invalidateQueries({ queryKey: documentKeys.current });
+      }
+
       if (error instanceof DOMException && error.name === 'AbortError') {
         return;
       }
