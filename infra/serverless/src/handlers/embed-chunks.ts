@@ -1,4 +1,4 @@
-import { embed } from '../clients/openai';
+import { embed } from '../clients/gemini';
 import { getJson, putJson } from '../clients/s3';
 import { env } from '../lib/env';
 import type { ChunkTextResult, EmbedChunksResult, EmbeddedChunk } from '../types/state';

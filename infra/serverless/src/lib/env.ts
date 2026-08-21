@@ -22,8 +22,8 @@ export const env = {
   bucketName: required('BUCKET_NAME'),
   tableName: required('TABLE_NAME'),
 
-  openaiApiKey: required('OPENAI_API_KEY'),
-  embeddingModel: required('OPENAI_EMBEDDING_MODEL'),
+  geminiApiKey: required('GEMINI_API_KEY'),
+  embeddingModel: required('GEMINI_EMBEDDING_MODEL'),
   embeddingDimensions: requiredNumber('EMBEDDING_DIMENSIONS'),
   embedBatchSize: requiredNumber('EMBED_BATCH_SIZE'),
 
