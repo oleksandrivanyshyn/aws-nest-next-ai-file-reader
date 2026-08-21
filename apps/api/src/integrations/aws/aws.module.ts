@@ -11,11 +11,6 @@ import { S3Service } from './s3.service';
     dynamoDbClientProvider,
     DynamoDbService,
   ],
-  exports: [
-    s3ClientProvider,
-    S3Service,
-    dynamoDbClientProvider,
-    DynamoDbService,
-  ],
+  exports: [S3Service, DynamoDbService],
 })
 export class AwsModule {}

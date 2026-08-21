@@ -4,6 +4,6 @@ import { PineconeService } from './pinecone.service';
 
 @Module({
   providers: [pineconeClientProvider, PineconeService],
-  exports: [pineconeClientProvider, PineconeService],
+  exports: [PineconeService],
 })
 export class PineconeModule {}
